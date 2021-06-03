@@ -3,7 +3,7 @@
 This is the code for a submitted paper on ethical session-based Recommendation using GNN.
 We have implemented our methods in Pytorch.
 
-Here are three datasets we used in our work/:
+Here are three datasets we used in our work:
 
 1- Reddit https://www.kaggle.com/colemaclean/subreddit-interactions
 
