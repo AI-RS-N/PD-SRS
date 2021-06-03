@@ -11,7 +11,7 @@ Here are three datasets we used in our work:
 
 These two data are available from A-PGNN study: https://github.com/CRIPAC-DIG/A-PGNN
 
-3- DIGINETICA: http://cikm2016.cs.iupui.edu/cikm-cup or https://competitions.codalab.org/competitions/11161
+3- Diginetica: http://cikm2016.cs.iupui.edu/cikm-cup or https://competitions.codalab.org/competitions/11161
 
 # Usage
 First, run the file preprocess.py to preprocess the data.
