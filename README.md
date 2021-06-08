@@ -30,6 +30,6 @@ Python 3
 PyTorch 0.4.0
 
 # Some other GitHub links that this study is inspired by:
-SR-GNN ("paper title: Session-Based Recommendation with Graph Neural Networks"): [https://github.com/CRIPAC-DIG/SR-GNN]
+SR-GNN ("paper title: Session-Based Recommendation with Graph Neural Networks"): (https://github.com/CRIPAC-DIG/SR-GNN)
 
-NISER ("paper title: NISER: Normalized Item and Session Representations with Graph Neural Networks"): [https://github.com/johnny12150/NISER]
+NISER ("paper title: NISER: Normalized Item and Session Representations with Graph Neural Networks"): (https://github.com/johnny12150/NISER)
