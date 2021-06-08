@@ -16,11 +16,15 @@ These two data are available from A-PGNN study: https://github.com/CRIPAC-DIG/A-
 # Usage
 First, run the file preprocess.py to preprocess the data.
 
-For example: ```python preprocess.py --dataset=Xing```
+For example:
+
+```python preprocess.py --dataset=Xing```
 
 Then, run the file main.py to train the model.
 
-For example: ```python main.py --dataset=Xing```
+For example: 
+
+```python main.py --dataset=Xing```
 
 You can change the parameters according to the usage.
 
