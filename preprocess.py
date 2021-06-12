@@ -24,6 +24,7 @@ elif opt.dataset =='Reddit':
     dataset = 'Reddit/reddit.csv'
 
 print("-- Starting @ %ss" % datetime.datetime.now())
+start = time.time()
 with open(dataset, "r") as f:
     if opt.dataset == 'Xing' or opt.dataset == 'Reddit':
         reader = csv.DictReader(f, delimiter=',')
@@ -83,35 +84,35 @@ with open(dataset, "r") as f:
         sess_date[curid] = date
 print("-- Reading data @ %ss" % datetime.datetime.now())
 
-# Filter out length 1 sessions
-for s in list(sess_clicks):
-    if len(sess_clicks[s]) == 1:
-        del sess_clicks[s]
-        if opt.dataset == 'diginetica':
-            del sess_date[s]
+## Filter out length 1 sessions
+#for s in list(sess_clicks):
+#    if len(sess_clicks[s]) == 1:
+#        del sess_clicks[s]
+#        if opt.dataset == 'diginetica':
+#            del sess_date[s]
 
-# Count number of times each item appears
-iid_counts = {}
-for s in sess_clicks:
-    seq = sess_clicks[s]
-    for iid in seq:
-        if iid in iid_counts:
-            iid_counts[iid] += 1
-        else:
-            iid_counts[iid] = 1
+## Count number of times each item appears
+#iid_counts = {}
+#for s in sess_clicks:
+#    seq = sess_clicks[s]
+#    for iid in seq:
+#        if iid in iid_counts:
+#            iid_counts[iid] += 1
+#        else:
+#            iid_counts[iid] = 1
 
-sorted_counts = sorted(iid_counts.items(), key=operator.itemgetter(1))
+#sorted_counts = sorted(iid_counts.items(), key=operator.itemgetter(1))
 
-length = len(sess_clicks)
-for s in list(sess_clicks):
-    curseq = sess_clicks[s]
-    filseq = list(filter(lambda i: iid_counts[i] >= 5, curseq))
-    if len(filseq) < 2:
-        del sess_clicks[s]
-        if opt.dataset == 'diginetica':
-            del sess_date[s]
-    else:
-        sess_clicks[s] = filseq
+#length = len(sess_clicks)
+#for s in list(sess_clicks):
+#    curseq = sess_clicks[s]
+#    filseq = list(filter(lambda i: iid_counts[i] >= 5, curseq))
+#    if len(filseq) < 2:
+#        del sess_clicks[s]
+#        if opt.dataset == 'diginetica':
+#            del sess_date[s]
+#    else:
+#        sess_clicks[s] = filseq
 
 
 #-- Splitting train set and test set
@@ -126,7 +127,7 @@ if opt.dataset == 'Xing' or opt.dataset == 'Reddit':      #Split out %20 of each
     train=[]
     #print(df['user'].max())
     for i in range(df['user'].max()):
-        if i%3000==0:
+        #if i%3000==0:
             #print(i)
         dd=df[df['user']==i]
         minimum=dd['session_id'].min()
@@ -170,10 +171,12 @@ elif opt.dataset == 'diginetica':     #Split out test set based on dates (7 days
     #testt.sort_values(by='session_id', ascending=True, ignore_index=True)
     #print(' train:', trainn, '\n test: ',testt)
 
-
+trainn.to_csv(opt.dataset+'/trainn.csv', header=True, index=False)
+testt.to_csv(opt.dataset+'/testt.csv', header=True, index=False)
+    
 #AVG session lenght
 a=0
-for i in range(len(sess_clicks)):
+for i in df['session_id'].unique():
     a+=len(sess_clicks[str(i)])
 print('AVG session lenght:',a/len(sess_clicks))  
 #statistics
@@ -201,7 +204,7 @@ def Seq_without_uid(data,df,train=True):
         df=pd.DataFrame(columns=['session_id','test_seq','test_lab'])
     sid=data['session_id'].unique()
     for en,i in enumerate(sid):
-        if en%40000==0:
+        #if en%40000==0:
             #print(en)
         s=data[data['session_id']==i]
         if train:
@@ -220,7 +223,7 @@ def Seq_with_uid(data,df,train=True):
         df=pd.DataFrame(columns=['user_id','session_id','test_seq','test_lab'])
     uid=data['user'].unique()
     for en,i in enumerate(uid):
-        if en%3000==0:
+        #if en%3000==0:
             #print(en)
         u=data[data['user']==i]
         s=u['session_id'].unique()
@@ -238,9 +241,12 @@ def Seq_with_uid(data,df,train=True):
 if opt.dataset == 'Xing' or opt.dataset == 'Reddit': 
     df_t=Seq_with_uid(testt,df,train=False)
     df_tr=Seq_with_uid(trainn,df,train=True)
-elif if opt.dataset == 'diginetica':
+elif opt.dataset == 'diginetica':
     df_t=Seq_without_uid(testt,df,train=False)
     df_tr=Seq_without_uid(trainn,df,train=True)
+
+df_t.to_csv(opt.dataset+'/df_t.csv', header=True, index=False)
+df_tr.to_csv(opt.dataset+'/df_tr.csv', header=True, index=False)
 
 te_ids=df_t['session_id']
 te_seqs=df_t['test_seq']
@@ -280,26 +286,34 @@ tes = (te_seqs, te_labs)
 #print('tes_seqs Len:',len(te_seqs))
 print('tr_seqs[:6]:', tr_seqs[:6], '\ntr_labs[:6]:', tr_labs[:6])
 print('te_seqs[:6]:', te_seqs[:6], '\nte_labs[:6]:', te_labs[:6])
-  
+
+
 if opt.dataset == 'Xing':
     if not os.path.exists('Xing'):
         os.makedirs('Xing')
     pickle.dump(tra, open('Xing/train.txt', 'wb'))
     pickle.dump(tes, open('Xing/test.txt', 'wb'))
-    pickle.dump(df_t, open('Xing/df_t.csv', 'wb'))
-    pickle.dump(df_tr, open('Xing/df_tr.csv', 'wb'))
 elif opt.dataset == 'Reddit':
     if not os.path.exists('Reddit'):
         os.makedirs('Reddit')
     pickle.dump(tra, open('Reddit/train.txt', 'wb'))
     pickle.dump(tes, open('Reddit/test.txt', 'wb'))
-    pickle.dump(df_t, open('Reddit/df_t.csv', 'wb'))
-    pickle.dump(df_tr, open('Reddit/df_tr.csv', 'wb'))
 elif opt.dataset == 'diginetica':
     if not os.path.exists('diginetica'):
         os.makedirs('diginetica')
     pickle.dump(tra, open('diginetica/train.txt', 'wb'))
     pickle.dump(tes, open('diginetica/test.txt', 'wb'))
-    pickle.dump(df_t, open('diginetica/df_t.csv', 'wb'))
-    pickle.dump(df_tr, open('diginetica/df_tr.csv', 'wb'))
 print('Done.')
+
+# item_clicks
+print('finding source and targets of clicks for deepwalk: it may take long time')
+item_clicks=pd.DataFrame(columns=['source','target'])
+for i in df['session_id'].unique():
+    lenght=len(df[df['session_id']==i])
+    for j in range(lenght-1):
+        item_clicks=item_clicks.append({'source': df[df['session_id']==i].reset_index(drop=True)['item'][j],'target': df[df['session_id']==i].reset_index(drop=True)['item'][j+1]}, ignore_index=True)
+item_clicks.drop_duplicates(keep="first",inplace=True)
+item_clicks=item_clicks.reset_index(drop=True)
+item_clicks.to_csv(opt.dataset+'/item_clicks.csv', header=True, index=False)
+end = time.time()
+print("Run time: %f s" % (end - start))

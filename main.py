@@ -3,18 +3,21 @@
 import argparse
 import pickle
 import time
+import networkx as nx
+import pandas as pd
+from gensim.models import Word2Vec
 import copy
 from copy import deepcopy
 from utils import *
 from model_GNN import *
-from re-rank import *
+from rerank import *
 
 torch.cuda.set_device(1)
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', default='Xing', help='dataset name: diginetica/yoochoose1_4/yoochoose1_64/sample/Xing')
 parser.add_argument('--batchSize', type=int, default=100, help='input batch size')
 parser.add_argument('--hiddenSize', type=int, default=100, help='hidden state size')
-parser.add_argument('--epoch', type=int, default=3, help='the number of epochs to train for')
+parser.add_argument('--epoch', type=int, default=1, help='the number of epochs to train for')
 parser.add_argument('--lr', type=float, default=0.001, help='learning rate')  # [0.001, 0.0005, 0.0001]
 parser.add_argument('--lr_dc', type=float, default=0.1, help='learning rate decay rate')
 parser.add_argument('--lr_dc_step', type=int, default=3, help='the number of steps after which the learning rate decay')
@@ -48,11 +51,15 @@ def main():
     elif opt.dataset == 'Reddit':
         n_node = 80000
 
-
     model = trans_to_cuda(SessionGraph(opt, n_node))
     #print(model)
 
-
+    
+    trainn=pd.read_csv(opt.dataset+'/trainn.csv', delimiter=',')
+    testt=pd.read_csv(opt.dataset+'/testt.csv', delimiter=',')
+    df_tr=pd.read_csv(opt.dataset+'/df_tr.csv', delimiter=',')
+    df_t=pd.read_csv(opt.dataset+'/df_t.csv', delimiter=',')
+    
     start = time.time()
     best_result = [0, 0, 0, 0, 0, 0]
     best_epoch = [0, 0, 0, 0, 0, 0]
@@ -93,17 +100,40 @@ def main():
     end = time.time()
     print("Run time: %f s" % (end - start))
     #print('Targets[0:5]:', Targets[0:5], '\nscores20_ind[0:5]:', scores20_ind[0:5], '\nscores20_value[0:5]:', scores20_value[0:5])
+    print('Wait! it continues...')
+    
+    if opt.dataset == 'diginetica':
+        dataset = 'diginetica/train-item-views.csv'
+    elif opt.dataset =='Xing':
+        dataset = 'Xing/xing.csv'
+    elif opt.dataset =='Reddit':
+        dataset = 'Reddit/reddit.csv'
 
+    
+    if opt.dataset == 'Xing' or opt.dataset == 'Reddit':      #Split out %20 of each user's sessions as test set 
+        df = pd.read_csv(dataset, delimiter=',')
+        df=df.drop(['Unnamed: 0'], axis=1)
+    elif opt.dataset == 'diginetica':     #Split out test set based on dates (7 days for test)
+        df = pd.read_csv(dataset, delimiter=';')
+        df=df.drop(['userId'], axis=1)
+        df=df.rename(columns={"sessionId": "session_id", "itemId": "item_id", "eventdate": "ts"})
+        
+    
     start2 = time.time()
-    item_clicks=pd.DataFrame(columns=['source','target'])
-    for i in df['session_id'].unique():
-        lenght=len(df[df['session_id']==i])
-        for j in range(lenght-1):
-            item_clicks=item_clicks.append({'source': df[df['session_id']==i].reset_index(drop=True)['item'][j],'target': df[df['session_id']==i].reset_index(drop=True)['item'][j+1]}, ignore_index=True)
-    item_clicks.drop_duplicates(keep="first",inplace=True)
-    item_clicks=item_clicks.reset_index(drop=True)
-
-    G=nx.from_pandas_edgelist(item_clicks, "source", "target", edge_attr=True, create_using=nx.Graph())
+    item_clicks=pd.read_csv(opt.dataset+'/item_clicks.csv', delimiter=',')
+    G=nx.from_pandas_edgelist(item_clicks, "source", "target", edge_attr=None, create_using=nx.Graph())
+    # function to generate random walk sequences of nodes
+    def get_randomwalk(node, path_length):
+        random_walk = [node]
+        for i in range(path_length-1):
+            temp = list(G.neighbors(node))
+            temp = list(set(temp) - set(random_walk))    
+            if len(temp) == 0:
+                break
+            random_node = random.choice(temp)
+            random_walk.append(random_node)
+            node = random_node  
+        return random_walk 
     all_nodes = list(G.nodes())
     random_walks = []
     for n in tqdm(all_nodes):
@@ -115,26 +145,31 @@ def main():
                      negative = 10, # for negative sampling
                      alpha=0.03, min_alpha=0.0007,
                      seed = 14)
+    print('DeepWalk model:',model_deepwalk)
+    
 
     model_deepwalk.build_vocab(random_walks, progress_per=2)
-    model_deepwalk.train(random_walks, total_examples = model.corpus_count, epochs=20, report_delay=1)
+    print('training...')
+    model_deepwalk.train(random_walks, total_examples = model_deepwalk.corpus_count, epochs=20, report_delay=1)
     #terms=item_clicks['source'].unique()
     #plot_nodes(terms)
-
-
+    
+    print('Done') 
+    print('Wait for the results...')
+    alpha=opt.alpha
     #final listwise sim : how similar are the items in the current session -> to predict top-k items as the next click
     df_t['Sim_list'] = ""   #df_t is the dataframe for test sequences (refer to preprocess.py) 
     for ind in range(len(df_t)):
-        if len(df_t['test_seq'][ind])==1:
+        if len(df_t['test_seq'][ind].strip('][').split(', '))==1:
             df_t['Sim_list'][ind]=1
         else:
             Tsim=[]
-            for counter, i in enumerate(df_t['test_seq'][ind][0:len(df_t['test_seq'][ind])-1]):
-                for j in df_t['test_seq'][ind][counter+1:len(df_t['test_seq'][ind])]:
-                    sim=model_deepwalk.wv.similarity(i, j)   # find similarity between two items based on our Word2vec model
+            for counter, i in enumerate(df_t['test_seq'][ind].strip('][').split(', ')[0:len(df_t['test_seq'][ind].strip('][').split(', '))-1]):
+                for j in df_t['test_seq'][ind].strip('][').split(', ')[counter+1:len(df_t['test_seq'][ind].strip('][').split(', '))]:
+                    sim=model_deepwalk.wv.similarity(int(i), int(j))   # find similarity between two items based on our Word2vec model
                     Tsim.append(sim)
             df_t['Sim_list'][ind]=sum(Tsim)/len(Tsim)
-
+    df_t.to_csv(opt.dataset+'/df_t.csv', header=True, index=False)
 
     ## unpopularity calculation
     pop=[]
@@ -149,16 +184,16 @@ def main():
 
     ## Assign set of long-tail items
     ind=Unpop[Unpop['unpop']>=0.999].index   #choose it in a way to have 10% of less popular items as long-tail items
-    print(ind)
+    #print(ind)
     LT=df['item'][ind].tolist()
     #print('These two should have same length (if not: something went wrong):',len(LID),len(scores5_ind))
-
+    alpha=opt.alpha
     scores5_ind1 = deepcopy(scores5_ind)
     scores10_ind1 = deepcopy(scores10_ind)
     scores20_ind1 = deepcopy(scores20_ind)
-    scores5_ind_new=LT_inclusion(scores5_ind,alpha,df_t)
-    scores10_ind_new=LT_inclusion(scores10_ind,alpha,df_t)
-    scores20_ind_new=LT_inclusion(scores20_ind,alpha,df_t)
+    scores5_ind_new=LT_inclusion(scores5_ind,alpha,df_t,LT,scores5000_ind)
+    scores10_ind_new=LT_inclusion(scores10_ind,alpha,df_t,LT,scores5000_ind)
+    scores20_ind_new=LT_inclusion(scores20_ind,alpha,df_t,LT,scores5000_ind)
 
     #top-5:
     be=list(set([item for sublist in scores5_ind1 for item in sublist]))
