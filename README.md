@@ -35,3 +35,7 @@ PyTorch 0.4.0
 SR-GNN ("paper title: Session-Based Recommendation with Graph Neural Networks"): https://github.com/CRIPAC-DIG/SR-GNN
 
 NISER ("paper title: NISER: Normalized Item and Session Representations with Graph Neural Networks"): https://github.com/johnny12150/NISER
+
+STAMP ("paper title: Stamp: short-term attention/memory priority model for session-based recommendation"): https://github.com/uestcnlp/STAMP
+
+NARM ("paper title: Neural attentive session-based recommendation"): https://github.com/lijingsdu/sessionRec_NARM
