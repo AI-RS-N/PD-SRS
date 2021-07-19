@@ -9,7 +9,7 @@ Here are three datasets we used in our work:
 
 2- Xing http://2016.recsyschallenge.com/
 
-These two data are available from A-PGNN study: https://github.com/CRIPAC-DIG/A-PGNN
+These two datasets are available from A-PGNN study: https://github.com/CRIPAC-DIG/A-PGNN
 
 3- Diginetica: http://cikm2016.cs.iupui.edu/cikm-cup or https://competitions.codalab.org/competitions/11161
 
