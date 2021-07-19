@@ -30,7 +30,7 @@ parser.add_argument('--valid_portion', type=float, default=0.1, help='split the 
 parser.add_argument('--norm', default=True, help='adapt NISER, l2 norm over item and session embedding')
 parser.add_argument('--TA', default=False, help='use target-aware or not')
 parser.add_argument('--scale', default=True, help='scaling factor sigma')
-parser.add_argument('--alpha', type=float, default=0.5, help='alpha: to determine the proportion of long-tail items in top-k recommendation based on user LID')  # [0.1, 0.5, 1.0]
+parser.add_argument('--alpha', type=float, default=0.5, help='alpha: to determine the proportion of long-tail items in top-k recommendation based on user LID')#[0.1, 0.5, 1.0]
 opt,a= parser.parse_known_args()
 print(opt)
 
@@ -67,7 +67,8 @@ def main():
     for epoch in range(opt.epoch):
         print('-------------------------------------------------------')
         print('epoch: ', epoch)
-        hit5, mrr5, hit10, mrr10, hit20, mrr20, Targets, scores5_value, scores5_ind, scores10_value, scores10_ind, scores20_value, scores20_ind, scores5000_value, scores5000_ind = train_test(model, train_data, test_data)
+        hit5, mrr5, hit10, mrr10, hit20, mrr20, Targets, scores5_value, scores5_ind, scores10_value, scores10_ind, scores20_value, scores20_ind, scores5000_value, 
+        scores5000_ind = train_test(model, train_data, test_data)
         flag = 0
         if hit5 >= best_result[0]:
             best_result[0] = hit5
@@ -92,7 +93,12 @@ def main():
             best_epoch[5] = epoch
             flag = 1
         print('Best Result:')
-        print('Recall@5:%.4f\tMMR@5:%.4f\tRecall@10:%.4f\tMMR@10:%.4f\tRecall@20:%.4f\tMMR@20:%.4f\tEpoch:%d,\t%d,\t%d,\t%d,\t%d,\t%d'% (best_result[0], best_result[1], best_result[2], best_result[3], best_result[4], best_result[5], best_epoch[0], best_epoch[1], best_epoch[2], best_epoch[3], best_epoch[4], best_epoch[5]))
+        print('Recall@5:%.4f\tMMR@5:%.4f\tRecall@10:%.4f\tMMR@10:%.4f\tRecall@20:%.4f\tMMR@20:%.4f\tEpoch:%d,\t%d,\t%d,\t%d,\t%d,\t%d'% (best_result[0], best_result[1], 
+                                                                                                                                         best_result[2], best_result[3], 
+                                                                                                                                         best_result[4], best_result[5], 
+                                                                                                                                         best_epoch[0], best_epoch[1], 
+                                                                                                                                         best_epoch[2], best_epoch[3], 
+                                                                                                                                         best_epoch[4], best_epoch[5]))
         bad_counter += 1 - flag
         if bad_counter >= opt.patience:
             break
@@ -198,20 +204,26 @@ def main():
     #top-5:
     be=list(set([item for sublist in scores5_ind1 for item in sublist]))
     af=list(set([item for sublist in scores5_ind_new for item in sublist]))
-    print('\nnum of LT items (before):',sum(pd.Series(be).isin(LT)),'\nnum of LT items (the proposed method):',sum(pd.Series(af).isin(LT)),'\ntotal number of LT items:',len(LT))
-    print('\nLT coverage (before):',sum(pd.Series(be).isin(LT))/len(LT),'\nLT coverage (the proposed method):',sum(pd.Series(af).isin(LT))/len(LT),'\nimprovement (times):',sum(pd.Series(af).isin(LT))/sum(pd.Series(be).isin(LT)))
+    print('\nnum of LT items (before):',sum(pd.Series(be).isin(LT)),'\nnum of LT items (the proposed method):',sum(pd.Series(af).isin(LT)),
+          '\ntotal number of LT items:',len(LT))
+    print('\nLT coverage (before):',sum(pd.Series(be).isin(LT))/len(LT),'\nLT coverage (the proposed method):',sum(pd.Series(af).isin(LT))/len(LT),
+          '\nimprovement (times):',sum(pd.Series(af).isin(LT))/sum(pd.Series(be).isin(LT)))
 
     #top-10:
     be=list(set([item for sublist in scores10_ind1 for item in sublist]))
     af=list(set([item for sublist in scores10_ind_new for item in sublist]))
-    print('\nnum of LT items (before):',sum(pd.Series(be).isin(LT)),'\nnum of LT items (the proposed method):',sum(pd.Series(af).isin(LT)),'\ntotal number of LT items:',len(LT))
-    print('\nLT coverage (before):',sum(pd.Series(be).isin(LT))/len(LT),'\nLT coverage (the proposed method):',sum(pd.Series(af).isin(LT))/len(LT),'\nimprovement (times):',sum(pd.Series(af).isin(LT))/sum(pd.Series(be).isin(LT)))
+    print('\nnum of LT items (before):',sum(pd.Series(be).isin(LT)),'\nnum of LT items (the proposed method):',sum(pd.Series(af).isin(LT)),
+          '\ntotal number of LT items:',len(LT))
+    print('\nLT coverage (before):',sum(pd.Series(be).isin(LT))/len(LT),'\nLT coverage (the proposed method):',sum(pd.Series(af).isin(LT))/len(LT),
+          '\nimprovement (times):',sum(pd.Series(af).isin(LT))/sum(pd.Series(be).isin(LT)))
 
     #top-20:
     be=list(set([item for sublist in scores20_ind1 for item in sublist]))
     af=list(set([item for sublist in scores20_ind_new for item in sublist]))
-    print('\nnum of LT items (before):',sum(pd.Series(be).isin(LT)),'\nnum of LT items (the proposed method):',sum(pd.Series(af).isin(LT)),'\ntotal number of LT items:',len(LT))
-    print('\nLT coverage (before):',sum(pd.Series(be).isin(LT))/len(LT),'\nLT coverage (the proposed method):',sum(pd.Series(af).isin(LT))/len(LT),'\nimprovement (times):',sum(pd.Series(af).isin(LT))/sum(pd.Series(be).isin(LT)))
+    print('\nnum of LT items (before):',sum(pd.Series(be).isin(LT)),'\nnum of LT items (the proposed method):',sum(pd.Series(af).isin(LT)),
+          '\ntotal number of LT items:',len(LT))
+    print('\nLT coverage (before):',sum(pd.Series(be).isin(LT))/len(LT),'\nLT coverage (the proposed method):',sum(pd.Series(af).isin(LT))/len(LT),
+          '\nimprovement (times):',sum(pd.Series(af).isin(LT))/sum(pd.Series(be).isin(LT)))
 
 
     print('Recall@5 and MRR@5:',hit_mrr(scores5_ind_new, Targets))
