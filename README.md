@@ -36,7 +36,7 @@ NISER ("paper title: NISER: Normalized Item and Session Representations with Gra
 
 SR-GNN ("paper title: Session-Based Recommendation with Graph Neural Networks"): https://github.com/CRIPAC-DIG/SR-GNN
 
-A-PGNN ("Personalized graph neural networks with attention mechanism for session-aware recommendation"): https://github.com/CRIPAC-DIG/A-PGNN 
+A-PGNN ("paper title: Personalized graph neural networks with attention mechanism for session-aware recommendation"): https://github.com/CRIPAC-DIG/A-PGNN 
 
 STAMP ("paper title: Stamp: short-term attention/memory priority model for session-based recommendation"): https://github.com/uestcnlp/STAMP
 
