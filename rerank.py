@@ -20,7 +20,7 @@ print(opt)
 
 
 ## Re-ranking Mechanism
-def LT_inclusion(scores_ind,alpha,df_t,LT,scores5000_ind):   #df_t is the dataframe for test sequences (refer to preprocess.py)
+def LT_inclusion(scores_ind,alpha,df_t,lt,scores5000_ind):   #df_t is the dataframe for test sequences (refer to preprocess.py)
     alpha=opt.alpha  #hyper parameter to determine how many LT is needed based on the LID in current session
     LID=1-df_t['Sim_list']  #level of interest to diversity in current session s for user u
     D=alpha*LID
@@ -28,25 +28,25 @@ def LT_inclusion(scores_ind,alpha,df_t,LT,scores5000_ind):   #df_t is the datafr
     for ix in range(len(scores_ind)):
         #print('how many LT items can be included based on its LID in current session:',math.floor(len(scores_ind[ix])*D[ix]))
         #print('scores_ind:',scores_ind[ix])
-        #print(pd.Series(scores_ind[ix]).isin(LT))
-        pos=[ii for ii, x in enumerate(pd.Series(scores_ind[ix]).isin(LT)) if x] #position (index) of long tail items in top-k recommendation
+        #print(pd.Series(scores_ind[ix]).isin(lt))
+        pos=[ii for ii, x in enumerate(pd.Series(scores_ind[ix]).isin(lt)) if x] #position (index) of long tail items in top-k recommendation
         #print('position of LT items in top-k list:',pos)
         if len(pos)>0:
             a=[]
             for j in range(len(pos)):
                 a.append(scores_ind[ix][pos[j]])
             #print('\tLT items:',a)
-        sum(pd.Series(scores_ind[ix]).isin(LT))  #count of long tail items in top-k recommendation
-        #print('count of LT items in top-k list:',sum(pd.Series(scores_ind[ix]).isin(LT)))
-        pos2=[ij for ij, x in enumerate(pd.Series(scores5000_ind[ix]).isin(LT)) if x]
+        sum(pd.Series(scores_ind[ix]).isin(lt))  #count of long tail items in top-k recommendation
+        #print('count of LT items in top-k list:',sum(pd.Series(scores_ind[ix]).isin(lt)))
+        pos2=[ij for ij, x in enumerate(pd.Series(scores5000_ind[ix]).isin(lt)) if x]
         #print('position of LT items in top-500:',pos2)
         a=[]
         for p in range(len(pos2)):
             a.append(scores5000_ind[ix][pos2[p]])
         #print('\tLT items in top-500:',a)
-        if sum(pd.Series(scores_ind[ix]).isin(LT)) < math.floor(len(scores_ind[ix])*D[ix]): #if the number of existed LT items is less than the number of needed
+        if sum(pd.Series(scores_ind[ix]).isin(lt)) < math.floor(len(scores_ind[ix])*D[ix]): #if the number of existed LT items is less than the number of needed
             to_add=[]
-            for n in range(sum(pd.Series(scores_ind[ix]).isin(LT)),math.floor(len(scores_ind[ix])*D[ix])): #as much as needed (ignore the existed ones)
+            for n in range(sum(pd.Series(scores_ind[ix]).isin(lt)),math.floor(len(scores_ind[ix])*D[ix])): #as much as needed (ignore the existed ones)
                 to_add.append(a[n])
             #print(to_add)
             ar=np.arange(len(scores_ind[ix])).tolist()
@@ -65,9 +65,9 @@ def LT_inclusion(scores_ind,alpha,df_t,LT,scores5000_ind):   #df_t is the datafr
     return scores_ind_new 
 
 ##evaluation 
-def hit_mrr(scores_ind_new, Targets):
+def hit_mrr(scores_ind_new, targets_):
     hit,mrr=[],[]
-    for score, target in zip(scores_ind_new, Targets):
+    for score, target in zip(scores_ind_new, targets_):
         hit.append(np.isin(target - 1, score))
         if len(np.where(score == target - 1)[0]) == 0:
             mrr.append(0)
