@@ -220,7 +220,7 @@ def train_test(model, train_data, test_data):
     scores20_ind=[item for sublist in scores20_i for item in sublist]
     scores5000_value=[item for sublist in scores5000_val for item in sublist]
     scores5000_ind=[item for sublist in scores5000_i for item in sublist]
-    Targets=[item for sublist in Target for item in sublist]   
+    targets_=[item for sublist in Target for item in sublist]   
 
     hit5 = np.mean(hit5) * 100
     mrr5 = np.mean(mrr5) * 100
@@ -228,5 +228,5 @@ def train_test(model, train_data, test_data):
     mrr10 = np.mean(mrr10) * 100
     hit20 = np.mean(hit20) * 100
     mrr20 = np.mean(mrr20) * 100
-    return hit5, mrr5, hit10, mrr10, hit20, mrr20, Targets, scores5_value, scores5_ind, scores10_value, scores10_ind, scores20_value, scores20_ind, scores5000_value, scores5000_ind
+    return hit5, mrr5, hit10, mrr10, hit20, mrr20, targets_, scores5_value, scores5_ind, scores10_value, scores10_ind, scores20_value, scores20_ind, scores5000_value, scores5000_ind
 
