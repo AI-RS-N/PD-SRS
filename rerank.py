@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--alpha', type=float, default=0.5, help='alpha: to determine the proportion of long-tail items in top-k recommendation based on user LID')  # [0.1, 0.5, 1.0]
+parser.add_argument('--alpha', type=float, default=0.5, help='alpha: to determine the proportion of long-tail items in top-k recommendation based on user LID')#[0.1, 0.5, 1.0]
 opt,a= parser.parse_known_args()
 print(opt)
 
