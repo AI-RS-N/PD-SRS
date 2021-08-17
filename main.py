@@ -195,7 +195,7 @@ def main():
     #print('These two should have same length (if not: something went wrong):',len(LID),len(scores5_ind))
     alpha=opt.alpha
     scores5_ind1 = deepcopy(scores5_ind)
-    scores5_ind_new=lt_inclusion(scores5_ind,alpha,df_t,lt,scores5000_ind)
+    scores5_ind_new=LT_inclusion(scores5_ind,alpha,df_t,lt,scores5000_ind)
 
     #top-5:   and top-10 and top-20 can also be calculated this way...
     be=list(set([item for sublist in scores5_ind1 for item in sublist]))
