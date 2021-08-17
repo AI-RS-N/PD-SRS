@@ -311,7 +311,8 @@ item_clicks=pd.DataFrame(columns=['source','target'])
 for i in df['session_id'].unique():
     lenght=len(df[df['session_id']==i])
     for j in range(lenght-1):
-        item_clicks=item_clicks.append({'source': df[df['session_id']==i].reset_index(drop=True)['item'][j],'target': df[df['session_id']==i].reset_index(drop=True)['item'][j+1]}, ignore_index=True)
+        item_clicks=item_clicks.append({'source': df[df['session_id']==i].reset_index(drop=True)['item'][j],
+                                        'target': df[df['session_id']==i].reset_index(drop=True)['item'][j+1]}, ignore_index=True)
 item_clicks.drop_duplicates(keep="first",inplace=True)
 item_clicks=item_clicks.reset_index(drop=True)
 item_clicks.to_csv(opt.dataset+'/item_clicks.csv', header=True, index=False)
