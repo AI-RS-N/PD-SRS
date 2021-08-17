@@ -174,7 +174,7 @@ def train_test(model, train_data, test_data):
     slices = test_data.generate_batch(model.batch_size)
     #scores5_ind=[]
     scores5_i , scores5_val, scores10_i, scores10_val, scores20_i, scores20_val, scores5000_i, scores5000_val = [], [], [], [], [], [], [], []
-    Target=[]
+    target_=[]
     for i in slices:
         targets, scores = forward(model, i, test_data)
         scores5_val.append(trans_to_cpu(scores.topk(5)[0]).detach().numpy())
@@ -190,7 +190,7 @@ def train_test(model, train_data, test_data):
         scores20_i.append(sub_scores20)
         scores5000_i.append(sub_scores500)
 
-        Target.append(targets)
+        target_.append(targets)
 
         #np.concatenate([scores5_ind,sub_scores5])
         for score, target, mask in zip(sub_scores5, targets, test_data.mask):
@@ -220,7 +220,7 @@ def train_test(model, train_data, test_data):
     scores20_ind=[item for sublist in scores20_i for item in sublist]
     scores5000_value=[item for sublist in scores5000_val for item in sublist]
     scores5000_ind=[item for sublist in scores5000_i for item in sublist]
-    targets_=[item for sublist in Target for item in sublist]   
+    targets_=[item for sublist in target_ for item in sublist]   
 
     hit5 = np.mean(hit5) * 100
     mrr5 = np.mean(mrr5) * 100
