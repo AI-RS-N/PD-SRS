@@ -67,7 +67,7 @@ def main():
     for epoch in range(opt.epoch):
         print('-------------------------------------------------------')
         print('epoch: ', epoch)
-        hit5, mrr5, hit10, mrr10, hit20, mrr20, Targets, scores5_value, scores5_ind, scores10_value, scores10_ind, scores20_value, scores20_ind, scores5000_value, 
+        hit5, mrr5, hit10, mrr10, hit20, mrr20, targets, scores5_value, scores5_ind, scores10_value, scores10_ind, scores20_value, scores20_ind, scores5000_value, 
         scores5000_ind = train_test(model, train_data, test_data)
         flag = 0
         if hit5 >= best_result[0]:
@@ -105,7 +105,7 @@ def main():
     print('-------------------------------------------------------')
     end = time.time()
     print("Run time: %f s" % (end - start))
-    #print('Targets[0:5]:', Targets[0:5], '\nscores20_ind[0:5]:', scores20_ind[0:5], '\nscores20_value[0:5]:', scores20_value[0:5])
+    #print('targets[0:5]:', targets[0:5], '\nscores20_ind[0:5]:', scores20_ind[0:5], '\nscores20_value[0:5]:', scores20_value[0:5])
     print('Wait! it continues...')
     
     if opt.dataset == 'diginetica':
@@ -226,9 +226,9 @@ def main():
           '\nimprovement (times):',sum(pd.Series(af).isin(LT))/sum(pd.Series(be).isin(LT)))
 
 
-    print('Recall@5 and MRR@5:',hit_mrr(scores5_ind_new, Targets))
-    print('Recall@10 and MRR@10:',hit_mrr(scores10_ind_new, Targets))
-    print('Recall@20 and MRR@20:',hit_mrr(scores20_ind_new, Targets))
+    print('Recall@5 and MRR@5:',hit_mrr(scores5_ind_new, targets))
+    print('Recall@10 and MRR@10:',hit_mrr(scores10_ind_new, targets))
+    print('Recall@20 and MRR@20:',hit_mrr(scores20_ind_new, targets))
 
     print('-------------------------------------------------------')
     end2 = time.time()
