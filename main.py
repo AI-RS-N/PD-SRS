@@ -14,7 +14,7 @@ from rerank import *
 
 torch.cuda.set_device(1)
 parser = argparse.ArgumentParser()
-parser.add_argument('--dataset', default='Xing', help='dataset name: diginetica/yoochoose1_4/yoochoose1_64/sample/Xing')
+parser.add_argument('--dataset', default='Xing', help='dataset name: diginetica/Xing/Reddit')
 parser.add_argument('--batchSize', type=int, default=100, help='input batch size')
 parser.add_argument('--hiddenSize', type=int, default=100, help='hidden state size')
 parser.add_argument('--epoch', type=int, default=30, help='the number of epochs to train for')
