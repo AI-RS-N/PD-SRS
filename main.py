@@ -169,12 +169,12 @@ def main():
         if len(df_t['test_seq'][ind].strip('][').split(', '))==1:
             df_t['Sim_list'][ind]=1
         else:
-            Tsim=[]
+            tsim=[]
             for counter, i in enumerate(df_t['test_seq'][ind].strip('][').split(', ')[0:len(df_t['test_seq'][ind].strip('][').split(', '))-1]):
                 for j in df_t['test_seq'][ind].strip('][').split(', ')[counter+1:len(df_t['test_seq'][ind].strip('][').split(', '))]:
                     sim=model_deepwalk.wv.similarity(int(i), int(j))   # find similarity between two items based on our Word2vec model
-                    Tsim.append(sim)
-            df_t['Sim_list'][ind]=sum(Tsim)/len(Tsim)
+                    tsim.append(sim)
+            df_t['Sim_list'][ind]=sum(tsim)/len(tsim)
     df_t.to_csv(opt.dataset+'/df_t.csv', header=True, index=False)
 
     ## unpopularity calculation
@@ -184,52 +184,28 @@ def main():
     pop_max=max(pop)
     pop_df=pd.DataFrame(pop, columns = ['pop'])
     pop=pop_df/pop_max
-    unpop=1-(pop_df/pop_max)
-    Unpop=unpop.rename(columns={"pop": "unpop"})
+    unpop_=1-(pop_df/pop_max)
+    unpop=unpop_.rename(columns={"pop": "unpop"})
 
 
     ## Assign set of long-tail items
-    ind=Unpop[Unpop['unpop']>=0.999].index   #choose it in a way to have 10% of less popular items as long-tail items
+    ind=unpop[unpop['unpop']>=0.95].index   #can be chosen to have 10% of less popular items as long-tail items
     #print(ind)
-    LT=df['item'][ind].tolist()
+    lt=df['item'][ind].tolist()
     #print('These two should have same length (if not: something went wrong):',len(LID),len(scores5_ind))
     alpha=opt.alpha
     scores5_ind1 = deepcopy(scores5_ind)
-    scores10_ind1 = deepcopy(scores10_ind)
-    scores20_ind1 = deepcopy(scores20_ind)
-    scores5_ind_new=LT_inclusion(scores5_ind,alpha,df_t,LT,scores5000_ind)
-    scores10_ind_new=LT_inclusion(scores10_ind,alpha,df_t,LT,scores5000_ind)
-    scores20_ind_new=LT_inclusion(scores20_ind,alpha,df_t,LT,scores5000_ind)
+    scores5_ind_new=lt_inclusion(scores5_ind,alpha,df_t,lt,scores5000_ind)
 
-    #top-5:
+    #top-5:   and top-10 and top-20 can also be calculated this way...
     be=list(set([item for sublist in scores5_ind1 for item in sublist]))
     af=list(set([item for sublist in scores5_ind_new for item in sublist]))
-    print('\nnum of LT items (before):',sum(pd.Series(be).isin(LT)),'\nnum of LT items (the proposed method):',sum(pd.Series(af).isin(LT)),
-          '\ntotal number of LT items:',len(LT))
-    print('\nLT coverage (before):',sum(pd.Series(be).isin(LT))/len(LT),'\nLT coverage (the proposed method):',sum(pd.Series(af).isin(LT))/len(LT),
-          '\nimprovement (times):',sum(pd.Series(af).isin(LT))/sum(pd.Series(be).isin(LT)))
-
-    #top-10:
-    be=list(set([item for sublist in scores10_ind1 for item in sublist]))
-    af=list(set([item for sublist in scores10_ind_new for item in sublist]))
-    print('\nnum of LT items (before):',sum(pd.Series(be).isin(LT)),'\nnum of LT items (the proposed method):',sum(pd.Series(af).isin(LT)),
-          '\ntotal number of LT items:',len(LT))
-    print('\nLT coverage (before):',sum(pd.Series(be).isin(LT))/len(LT),'\nLT coverage (the proposed method):',sum(pd.Series(af).isin(LT))/len(LT),
-          '\nimprovement (times):',sum(pd.Series(af).isin(LT))/sum(pd.Series(be).isin(LT)))
-
-    #top-20:
-    be=list(set([item for sublist in scores20_ind1 for item in sublist]))
-    af=list(set([item for sublist in scores20_ind_new for item in sublist]))
-    print('\nnum of LT items (before):',sum(pd.Series(be).isin(LT)),'\nnum of LT items (the proposed method):',sum(pd.Series(af).isin(LT)),
-          '\ntotal number of LT items:',len(LT))
-    print('\nLT coverage (before):',sum(pd.Series(be).isin(LT))/len(LT),'\nLT coverage (the proposed method):',sum(pd.Series(af).isin(LT))/len(LT),
-          '\nimprovement (times):',sum(pd.Series(af).isin(LT))/sum(pd.Series(be).isin(LT)))
-
-
+    print('\nnum of LT items (before):',sum(pd.Series(be).isin(lt)),'\nnum of LT items (the proposed method):',sum(pd.Series(af).isin(lt)),
+          '\ntotal number of LT items:',len(lt))
+    print('\nLT coverage (before):',sum(pd.Series(be).isin(lt))/len(lt),'\nLT coverage (the proposed method):',sum(pd.Series(af).isin(lt))/len(lt),
+          '\nimprovement (times):',sum(pd.Series(af).isin(lt))/sum(pd.Series(be).isin(lt)))
+   
     print('Recall@5 and MRR@5:',hit_mrr(scores5_ind_new, targets))
-    print('Recall@10 and MRR@10:',hit_mrr(scores10_ind_new, targets))
-    print('Recall@20 and MRR@20:',hit_mrr(scores20_ind_new, targets))
-
     print('-------------------------------------------------------')
     end2 = time.time()
     print("Run time: %f s" % (end2 - start2))
