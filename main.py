@@ -67,7 +67,7 @@ def main():
     for epoch in range(opt.epoch):
         print('-------------------------------------------------------')
         print('epoch: ', epoch)
-        hit5, mrr5, hit10, mrr10, hit20, mrr20, targets, scores5_value, scores5_ind, scores10_value, scores10_ind, scores20_value, scores20_ind, scores5000_value, 
+        hit5, mrr5, hit10, mrr10, hit20, mrr20, targets_, scores5_value, scores5_ind, scores10_value, scores10_ind, scores20_value, scores20_ind, scores5000_value, 
         scores5000_ind = train_test(model, train_data, test_data)
         flag = 0
         if hit5 >= best_result[0]:
@@ -105,7 +105,7 @@ def main():
     print('-------------------------------------------------------')
     end = time.time()
     print("Run time: %f s" % (end - start))
-    #print('targets[0:5]:', targets[0:5], '\nscores20_ind[0:5]:', scores20_ind[0:5], '\nscores20_value[0:5]:', scores20_value[0:5])
+    #print('targets[0:5]:', targets_[0:5], '\nscores20_ind[0:5]:', scores20_ind[0:5], '\nscores20_value[0:5]:', scores20_value[0:5])
     print('Wait! it continues...')
     
     if opt.dataset == 'diginetica':
@@ -205,7 +205,7 @@ def main():
     print('\nLT coverage (before):',sum(pd.Series(be).isin(lt))/len(lt),'\nLT coverage (the proposed method):',sum(pd.Series(af).isin(lt))/len(lt),
           '\nimprovement (times):',sum(pd.Series(af).isin(lt))/sum(pd.Series(be).isin(lt)))
    
-    print('Recall@5 and MRR@5:',hit_mrr(scores5_ind_new, targets))
+    print('Recall@5 and MRR@5:',hit_mrr(scores5_ind_new, targets_))
     print('-------------------------------------------------------')
     end2 = time.time()
     print("Run time: %f s" % (end2 - start2))
