@@ -1,6 +1,6 @@
-# Ethic-SRS
+# PD-SRS
 # Code 
-This is the code for a submitted paper on ethical session-based Recommendation using GNN.
+This is the code for a submitted paper on personalized diversified session-based Recommendation using GNNs.
 We have implemented our methods in Pytorch.
 
 Here are three datasets we used in our work:
