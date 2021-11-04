@@ -60,55 +60,6 @@ def main():
     df_tr=pd.read_csv(opt.dataset+'/df_tr.csv', delimiter=',')
     df_t=pd.read_csv(opt.dataset+'/df_t.csv', delimiter=',')
     
-    start = time.time()
-    best_result = [0, 0, 0, 0, 0, 0]
-    best_epoch = [0, 0, 0, 0, 0, 0]
-    bad_counter = 0
-    for epoch in range(opt.epoch):
-        print('-------------------------------------------------------')
-        print('epoch: ', epoch)
-        hit5, mrr5, hit10, mrr10, hit20, mrr20, targets_, scores5_value, scores5_ind, scores10_value, scores10_ind, scores20_value, scores20_ind, scores5000_value, scores5000_ind = train_test(model, train_data, test_data)
-        flag = 0
-        if hit5 >= best_result[0]:
-            best_result[0] = hit5
-            best_epoch[0] = epoch
-            flag = 1
-        if mrr5 >= best_result[1]:
-            best_result[1] = mrr5
-            best_epoch[1] = epoch
-        if hit10 >= best_result[2]:
-            best_result[2] = hit10
-            best_epoch[2] = epoch
-            flag = 1
-        if mrr10 >= best_result[3]:
-            best_result[3] = mrr10
-            best_epoch[3] = epoch
-        if hit20 >= best_result[4]:
-            best_result[4] = hit20
-            best_epoch[4] = epoch
-            flag = 1
-        if mrr20 >= best_result[5]:
-            best_result[5] = mrr20
-            best_epoch[5] = epoch
-            flag = 1
-        print('Best Result:')
-        print('Recall@5:%.4f\tMMR@5:%.4f\tRecall@10:%.4f\tMMR@10:%.4f\tRecall@20:%.4f\tMMR@20:%.4f\tEpoch:%d,\t%d,\t%d,\t%d,\t%d,\t%d'% (best_result[0], best_result[1], 
-                                                                                                                                         best_result[2], best_result[3], 
-                                                                                                                                         best_result[4], best_result[5], 
-                                                                                                                                         best_epoch[0], best_epoch[1], 
-                                                                                                                                         best_epoch[2], best_epoch[3], 
-                                                                                                                                         best_epoch[4], best_epoch[5]))
-        print('mean diversity of top-5:', diversity(scores5_ind),'mean diversity of top-10:',diversity(scores10_ind),'mean diversity of top-20:',diversity(scores20_ind))
-
-        bad_counter += 1 - flag
-        if bad_counter >= opt.patience:
-            break
-    print('-------------------------------------------------------')
-    end = time.time()
-    print("Run time: %f s" % (end - start))
-    #print('targets[0:5]:', targets_[0:5], '\nscores20_ind[0:5]:', scores20_ind[0:5], '\nscores20_value[0:5]:', scores20_value[0:5])
-    print('Wait! it continues...')
-    
     if opt.dataset == 'diginetica':
         dataset = 'diginetica/train-item-views.csv'
     elif opt.dataset =='Xing':
@@ -126,7 +77,7 @@ def main():
         df=df.rename(columns={"sessionId": "session_id", "itemId": "item_id", "eventdate": "ts"})
         
     
-    start2 = time.time()
+    start = time.time()
     item_clicks=pd.read_csv(opt.dataset+'/item_clicks.csv', delimiter=',')
     G=nx.from_pandas_edgelist(item_clicks, "source", "target", edge_attr=None, create_using=nx.Graph())
     # function to generate random walk sequences of nodes
@@ -177,7 +128,61 @@ def main():
                     tsim.append(sim)
             df_t['Sim_list'][ind]=sum(tsim)/len(tsim)
     df_t.to_csv(opt.dataset+'/df_t.csv', header=True, index=False)
+    end = time.time()
+    print("Run time: %f s" % (end - start))
+    print('Wait! it continues...')
+    
+    start2 = time.time()
+    best_result = [0, 0, 0, 0, 0, 0]
+    best_epoch = [0, 0, 0, 0, 0, 0]
+    bad_counter = 0
+    for epoch in range(opt.epoch):
+        print('-------------------------------------------------------')
+        print('epoch: ', epoch)
+        hit5, mrr5, hit10, mrr10, hit20, mrr20, targets_, scores5_value, scores5_ind, scores10_value, scores10_ind, scores20_value, scores20_ind, scores5000_value, scores5000_ind = train_test(model, train_data, test_data)
+        flag = 0
+        if hit5 >= best_result[0]:
+            best_result[0] = hit5
+            best_epoch[0] = epoch
+            flag = 1
+        if mrr5 >= best_result[1]:
+            best_result[1] = mrr5
+            best_epoch[1] = epoch
+        if hit10 >= best_result[2]:
+            best_result[2] = hit10
+            best_epoch[2] = epoch
+            flag = 1
+        if mrr10 >= best_result[3]:
+            best_result[3] = mrr10
+            best_epoch[3] = epoch
+        if hit20 >= best_result[4]:
+            best_result[4] = hit20
+            best_epoch[4] = epoch
+            flag = 1
+        if mrr20 >= best_result[5]:
+            best_result[5] = mrr20
+            best_epoch[5] = epoch
+            flag = 1
+        print('Best Result:')
+        print('Recall@5:%.4f\tMMR@5:%.4f\tRecall@10:%.4f\tMMR@10:%.4f\tRecall@20:%.4f\tMMR@20:%.4f\tEpoch:%d,\t%d,\t%d,\t%d,\t%d,\t%d'% (best_result[0], best_result[1], 
+                                                                                                                                         best_result[2], best_result[3], 
+                                                                                                                                         best_result[4], best_result[5], 
+                                                                                                                                         best_epoch[0], best_epoch[1], 
+                                                                                                                                         best_epoch[2], best_epoch[3], 
+                                                                                                                                         best_epoch[4], best_epoch[5]))
+        print('mean diversity of top-5:', diversity(scores5_ind),'mean diversity of top-10:',diversity(scores10_ind),'mean diversity of top-20:',diversity(scores20_ind))
 
+        bad_counter += 1 - flag
+        if bad_counter >= opt.patience:
+            break
+    print('-------------------------------------------------------')
+    end2 = time.time()
+    print("Run time: %f s" % (end2 - start2))
+    #print('targets[0:5]:', targets_[0:5], '\nscores20_ind[0:5]:', scores20_ind[0:5], '\nscores20_value[0:5]:', scores20_value[0:5])
+    print('Wait! it continues...')
+    
+
+    start3 = time.time()
     ## unpopularity calculation
     pop=[]
     for i in df['item'].unique():
@@ -210,8 +215,8 @@ def main():
     print('mean diversity of top-5:', diversity(scores5_ind_new))
 
     print('-------------------------------------------------------')
-    end2 = time.time()
-    print("Run time: %f s" % (end2 - start2))
+    end3 = time.time()
+    print("Run time: %f s" % (end3 - start3))
     
 if __name__ == '__main__':
     main()
