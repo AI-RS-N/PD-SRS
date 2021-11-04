@@ -67,7 +67,7 @@ def main():
     for epoch in range(opt.epoch):
         print('-------------------------------------------------------')
         print('epoch: ', epoch)
-        hit5, mrr5, hit10, mrr10, hit20, mrr20, targets_, scores5_value, scores5_ind, scores10_value, scores10_ind, scores20_value, scores20_ind, scores500_value, scores500_ind = train_test(model, train_data, test_data)
+        hit5, mrr5, hit10, mrr10, hit20, mrr20, targets_, scores5_value, scores5_ind, scores10_value, scores10_ind, scores20_value, scores20_ind, scores5000_value, scores5000_ind = train_test(model, train_data, test_data)
         flag = 0
         if hit5 >= best_result[0]:
             best_result[0] = hit5
