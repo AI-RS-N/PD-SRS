@@ -1,5 +1,6 @@
 import networkx as nx
 import math
+from math import comb
 import numpy as np
 import random
 import pandas as pd
@@ -78,6 +79,16 @@ def hit_mrr(scores_ind_new, targets_):
     return hit,mrr
 
 
+def diversity(scores_ind):
+    div = []
+    for i in range(len(scores_ind)):
+        a = 0
+        for j in range(len(scores_ind[0])):
+            for k in range(len(scores_ind[0])):
+                if j < k:
+                    a += model_deepwalk.wv.similarity(scores_ind[i][j], scores_ind[i][k])
+        div.append(a/comb(len(scores_ind[0]),2))  
+    return sum(div)/len(div)
 
 # 2D plot of items in the trained Word2Vev model
 def plot_nodes(word_list):
