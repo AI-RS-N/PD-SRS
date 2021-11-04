@@ -112,8 +112,8 @@ def main():
     #terms=item_clicks['source'].unique()
     #plot_nodes(terms)
     
-    print('Done') 
-    print('Wait for the results...')
+    print('DeepWalk model Done')
+    print('Wait! it is computing the similarity of items in users current sessions')
     alpha=opt.alpha
     #final listwise sim : how similar are the items in the current session -> to predict top-k items as the next click
     df_t['Sim_list'] = ""   #df_t is the dataframe for test sequences (refer to preprocess.py) 
