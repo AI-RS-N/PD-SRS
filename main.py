@@ -98,6 +98,8 @@ def main():
                                                                                                                                          best_epoch[0], best_epoch[1], 
                                                                                                                                          best_epoch[2], best_epoch[3], 
                                                                                                                                          best_epoch[4], best_epoch[5]))
+        print('mean diversity of top-5:', diversity(scores5_ind),'mean diversity of top-10:',diversity(scores10_ind),'mean diversity of top-20:',diversity(scores20_ind))
+
         bad_counter += 1 - flag
         if bad_counter >= opt.patience:
             break
@@ -205,6 +207,8 @@ def main():
           '\nimprovement (times):',sum(pd.Series(af).isin(lt))/sum(pd.Series(be).isin(lt)))
    
     print('Recall@5 and MRR@5:',hit_mrr(scores5_ind_new, targets_))
+    print('mean diversity of top-5:', diversity(scores5_ind_new))
+
     print('-------------------------------------------------------')
     end2 = time.time()
     print("Run time: %f s" % (end2 - start2))
